@@ -99,6 +99,11 @@ int main(int argc, char **argv)
     }
 	}
 
+	// Enviar el mensaje inicial al proceso que inicia la comunicación
+	printf("Proceso padre envía el mensaje inicial: %d\n", buffer[0]);
+	write(fd[start][1], &buffer, sizeof(buffer));
+
+
     // Esperar a que terminen todos los procesos hijos
     for (int i = 0; i < n; i++) {
         waitpid(pids[i], &status, 0);
