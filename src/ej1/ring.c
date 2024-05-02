@@ -79,7 +79,7 @@ int main(int argc, char **argv)
 	for (int i = 0; i < n; i++) {
     if (i == start) { // Si es el proceso que inicia la comunicación, leer el mensaje inicial
         read(fd[start][0], &buffer, sizeof(buffer));
-        printf("Proceso %d recibió el mensaje inicial: %d\n", start, buffer);
+        printf("Proceso %d recibió el mensaje inicial: %d\n", start, buffer[0]);
     }
 }
 
