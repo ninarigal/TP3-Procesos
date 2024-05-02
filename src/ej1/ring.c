@@ -34,42 +34,52 @@ int main(int argc, char **argv)
     printf("Se crearán %i procesos, se enviará el caracter %i desde proceso %i \n", n, buffer[0], start);
     
    	/* You should start programming from here... */
+	/* TO COMPLETE */
 
-	// Creación de pipes
-    int fd[n][2]; // file descriptors
-    int i;
-    for (i = 0; i < n; i++){
-        if (pipe(fd[i]) != 0){
-            fprintf(stderr, "Error al crear pipe\n");
-            exit(1);
+	int fd[n][2];
+    pid_t pids[n];
+
+    // Crear pipes
+    for (int i = 0; i < n; i++) {
+        if (pipe(fd[i]) != 0) {
+            fprintf(stderr, "Error en pipe\n");
+            return -1;
         }
     }
 
-    // Creación de procesos
-    for (i = 1; i <= n; i++) {
-        pid_t pid = fork();
-        if (pid < 0) {
-            fprintf(stderr, "Error al crear proceso\n");
-            exit(1);
-        } else if (pid == 0) {
-            // Proceso hijo
-            if (i == start) {
-                // Si es el proceso inicial, envía el mensaje inicial
-                write(fd[i-1][1], buffer, sizeof(buffer));
-            }
-            // Si no es el proceso inicial, recibe, incrementa y envía el mensaje
-            read(fd[(i-1)%n][0], buffer, sizeof(buffer));
+    // Crear procesos hijos
+    for (int i = 0; i < n; i++) {
+        pids[i] = fork();
+        if (pids[i] == -1) {
+            fprintf(stderr, "Error en fork\n");
+            return -1;
+        } else if (pids[i] == 0) { // Proceso hijo
+            close(fd[i][1]); // Cerrar el descriptor de escritura en el proceso hijo
+            read(fd[i][0], buffer, sizeof(buffer));
+            printf("Proceso %d recibió el mensaje: %d\n", i, buffer[0]);
             buffer[0]++;
-            write(fd[i%n][1], buffer, sizeof(buffer));
-            exit(0);
+            printf("Proceso %d incrementó el mensaje a: %d\n", i, buffer[0]);
+            write(fd[(i + 1) % n][1], buffer, sizeof(buffer));
+            printf("Proceso %d envió el mensaje al siguiente proceso\n", i);
+            close(fd[i][0]);
+            close(fd[(i + 1) % n][1]);
+            exit(0); // Importante: terminar el proceso hijo después de completar su trabajo
         }
     }
 
     // Proceso padre
-    // int status;
-    waitpid(-1, &status, 0);
-    read(fd[0][0], buffer, sizeof(buffer));
-    printf("El valor final es: %i\n", buffer[0]);
+    for (int i = 0; i < n; i++) {
+        close(fd[i][0]); // Cerrar el descriptor de lectura en el proceso padre
+        close(fd[i][1]); // Cerrar el descriptor de escritura en el proceso padre
+    }
+
+    // Iniciar la comunicación después de que se hayan creado todos los procesos hijos
+    write(fd[start][1], buffer, sizeof(buffer));
+    printf("Proceso %d envió el mensaje al siguiente proceso\n", start);
+
+    // Esperar a que termine el último proceso hijo
+    waitpid(pids[n - 1], &status, 0);
+    printf("El valor final es: %d\n", buffer[0]);
 
     return 0;
 }
