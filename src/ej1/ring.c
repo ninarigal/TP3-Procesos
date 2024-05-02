@@ -57,7 +57,7 @@ int main(int argc, char **argv)
             close(fd[i][1]); // Cerrar el descriptor de escritura en el proceso hijo
             read(fd[i][0], &buffer, sizeof(buffer));
             printf("Proceso %d recibió el mensaje: %d\n", i, buffer);
-            buffer++;
+            buffer[0]++;
             printf("Proceso %d incrementó el mensaje a: %d\n", i, buffer);
             write(fd[(i + 1) % n][1], &buffer, sizeof(buffer));
             printf("Proceso %d envió el mensaje al siguiente proceso\n", i);
