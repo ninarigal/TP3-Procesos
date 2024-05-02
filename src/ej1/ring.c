@@ -77,8 +77,11 @@ int main(int argc, char **argv)
     write(fd[start][1], buffer, sizeof(buffer));
     printf("Proceso %d envió el mensaje al siguiente proceso\n", start);
 
-    // Esperar a que termine el último proceso hijo
-    waitpid(pids[n - 1], &status, 0);
+    // Esperar a que terminen todos los procesos hijos
+    for (int i = 0; i < n; i++) {
+        waitpid(pids[i], &status, 0);
+    }
+
     printf("El valor final es: %d\n", buffer[0]);
 
     return 0;
