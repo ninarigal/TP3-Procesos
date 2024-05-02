@@ -135,7 +135,7 @@ int main(int argc, char **argv)
             printf("Proceso %d recibió el mensaje: %d\n", i, buffer[0]);
             buffer[0]++;
             printf("Proceso %d incrementó el mensaje a: %d\n", i, buffer[0]);
-            write(fd[(i + 1) % n][1], buffer, sizeof(buffer));
+            fprintf(fd[(i + 1) % n][1], buffer, sizeof(buffer));
             printf("Proceso %d envió el mensaje al siguiente proceso\n", i);
             close(fd[i][0]); // Cerrar el descriptor de lectura en el proceso hijo
             return 0; // Importante: terminar el proceso hijo después de completar su trabajo
@@ -158,7 +158,7 @@ int main(int argc, char **argv)
 
     // Enviar el mensaje inicial al proceso que inicia la comunicación
     printf("Proceso padre envía el mensaje inicial: %d\n", buffer[0]);
-    write(fd[start][1], &buffer, sizeof(buffer));
+    fprintf(fd[start][1], &buffer, sizeof(buffer));
 
     // Esperar a que terminen todos los procesos hijos
     for (int i = 0; i < n; i++) {
