@@ -168,7 +168,7 @@ int main(int argc, char **argv)
     printf("El valor final es: %d\n", buffer[0]);
 
     return 0;
-}
+
 }
 
 // Para compilar: gcc -o ring ring.c
