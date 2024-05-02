@@ -66,7 +66,7 @@ int main(int argc, char **argv)
     }
 
     // Proceso padre
-    int status;
+    // int status;
     waitpid(-1, &status, 0);
     read(fd[0][0], buffer, sizeof(buffer));
     printf("El valor final es: %i\n", buffer[0]);
@@ -74,3 +74,8 @@ int main(int argc, char **argv)
     return 0;
 }
 
+// Para compilar: gcc -o ring ring.c
+// Para ejecutar: ./ring <n> <c> <s> (n: cantidad de procesos, c: valor del mensaje inicial, s: número de proceso que inicia la comunicación)
+// Ejemplo: ./ring 5 3 2
+
+// Resultado esperado: El valor final es: 8
