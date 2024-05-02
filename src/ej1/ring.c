@@ -81,7 +81,6 @@ int main(int argc, char **argv)
 			write(fd[(i + 1) % n][1], buffer, sizeof(buffer));
 			printf("Proceso %d envió el mensaje al siguiente proceso\n", i);
 			close(fd[i][0]); // Cerrar el descriptor de lectura en el proceso hijo
-			return 0; // Importante: terminar el proceso hijo después de completar su trabajo
 		}
 	}
 
