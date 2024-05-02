@@ -20,7 +20,7 @@ por última vez y lo envía de vuelta al proceso padre. Este último debe mostra
 
 int main(int argc, char **argv)
 {	
-	int start, status, pid, n;
+	int start, status, n;
 	int buffer[1];
 
 	if (argc != 4){ printf("Uso: anillo <n> <c> <s> \n"); exit(0);}
@@ -61,8 +61,8 @@ int main(int argc, char **argv)
             printf("Proceso %d incrementó el mensaje a: %d\n", i, buffer[0]);
             write(fd[(i + 1) % n][1], buffer, sizeof(buffer));
             printf("Proceso %d envió el mensaje al siguiente proceso\n", i);
-            close(fd[i][0]);
-            close(fd[(i + 1) % n][1]);
+            close(fd[i][0]); // Cerrar el descriptor de lectura en el proceso hijo
+            close(fd[(i + 1) % n][1]); // Cerrar el descriptor de escritura en el siguiente proceso
             exit(0); // Importante: terminar el proceso hijo después de completar su trabajo
         }
     }
