@@ -89,7 +89,7 @@ int main(int argc, char **argv)
 
 	// Esperar a que los procesos hijos terminen
 	for (int i = 0; i < n; i++) {
-		wait(&status);
+		waitpid(-1, &status, 0);
 	}
 
 	// Cerrar los pipes
