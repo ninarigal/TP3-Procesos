@@ -148,7 +148,7 @@ int main(int argc, char **argv)
             }
         } else {  // Proceso padre
             if (i == n - 1) { // Si es el último proceso hijo, guardamos su PID
-                last_child_pid = pid;
+				int last_child_pid = pid;
             }
             close(pipes[i][0]);  // Cerramos el extremo de lectura
         }
