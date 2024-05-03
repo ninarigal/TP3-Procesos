@@ -141,7 +141,7 @@ int main(int argc, char **argv)
             close(pipes[(i + 1) % n][1]); // Se cierra el extremo de escritura en el siguiente proceso
             exit(EXIT_SUCCESS);
         } else {  // Proceso padre
-            close(pipes[i][0]);  // Cerramos el extremo de lectura
+            close(pipes[i][1]);  // Cerramos el extremo de lectura
         }
     }
 
