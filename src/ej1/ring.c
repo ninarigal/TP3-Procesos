@@ -135,9 +135,9 @@ int main(int argc, char **argv)
             } else {
                 printf("Proceso %d envía el mensaje %d al siguiente proceso\n", i, buffer[0]);
                 write(pipes[(i + 1) % n][1], &buffer, sizeof(int)); // Enviamos el mensaje al siguiente proceso
-                close(pipes[i][0]);
             }
-
+            
+            close(pipes[(i + 1) % n][1]); // Se cierra el extremo de escritura en el siguiente proceso
             exit(EXIT_SUCCESS);
         } else {  // Proceso padre
             close(pipes[i][0]);  // Cerramos el extremo de lectura
@@ -160,6 +160,8 @@ int main(int argc, char **argv)
 
     return 0;
 }
+
+
 
 // Para compilar: gcc -o ring ring.c
 // Para ejecutar: ./ring <n> <c> <s> (n: cantidad de procesos, c: valor del mensaje inicial, s: número de proceso que inicia la comunicación)
