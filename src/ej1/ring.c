@@ -185,14 +185,19 @@ int main(int argc, char **argv)
             close(pipes[i][1]);  // Cerramos el extremo de escritura
 
             // Paso 4: Transmisión del mensaje
-            if (i == start) { 
-				read(pipes[i][0], &buffer, sizeof(int));
-				printf("Proceso %d recibió el mensaje %d\n", i, buffer[0]);
-			} else {
-				read(pipes[i][0], &buffer, sizeof(int));
-				printf("Proceso %d recibió el mensaje %d\n", i, buffer[0]);
-				buffer[0]++;
-			}
+            // if (i == start) { 
+			// 	read(pipes[i][0], &buffer, sizeof(int));
+			// 	printf("Proceso %d recibió el mensaje %d\n", i, buffer[0]);
+			// 	buffer[0]++;
+			// } else {
+			// 	read(pipes[i][0], &buffer, sizeof(int));
+			// 	printf("Proceso %d recibió el mensaje %d\n", i, buffer[0]);
+			// 	buffer[0]++;
+			// }
+
+			read(pipes[i][0], &buffer, sizeof(int));
+			printf("Proceso %d recibió el mensaje %d\n", i, buffer[0]);
+			buffer[0]++;
 
 			// Corregir la condición para identificar el proceso que envía el mensaje de vuelta al padre
 			if (i == (start + n - 1) % n) {
