@@ -129,15 +129,14 @@ int main(int argc, char **argv)
             buffer[0]++; // Incrementamos el mensaje
 
             if (i == (start + n - 1) % n) { // El último hijo envía el mensaje al proceso padre
-				printf("Proceso %d envía el mensaje %d al proceso padre\n", i, buffer[0]);
-				write(pipes[start][1], &buffer, sizeof(int)); // Enviamos el mensaje al proceso padre
-				close(pipes[i][0]); // Se cierra el extremo de lectura
-			} else {
-				printf("Proceso %d envía el mensaje %d al siguiente proceso\n", i, buffer[0]);
-				write(pipes[(i + 1) % n][1], &buffer, sizeof(int)); // Enviamos el mensaje al siguiente proceso
-				close(pipes[(i + 1) % n][1]); // Se cierra el extremo de escritura en el siguiente proceso
-			}
-
+                printf("Proceso %d envía el mensaje %d al proceso padre\n", i, buffer[0]);
+                write(pipes[start][1], &buffer, sizeof(int)); // Enviamos el mensaje al proceso padre
+                close(pipes[i][0]);
+            } else {
+                printf("Proceso %d envía el mensaje %d al siguiente proceso\n", i, buffer[0]);
+                write(pipes[(i + 1) % n][1], &buffer, sizeof(int)); // Enviamos el mensaje al siguiente proceso
+				close(pipes[i][0]);
+            }
             
             close(pipes[(i + 1) % n][1]); // Se cierra el extremo de escritura en el siguiente proceso
             exit(EXIT_SUCCESS);
