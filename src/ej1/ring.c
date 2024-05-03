@@ -147,6 +147,9 @@ int main(int argc, char **argv)
                 exit(EXIT_SUCCESS);
             }
         } else {  // Proceso padre
+            if (i == n - 1) { // Si es el último proceso hijo, guardamos su PID
+                last_child_pid = pid;
+            }
             close(pipes[i][0]);  // Cerramos el extremo de lectura
         }
     }
@@ -156,10 +159,8 @@ int main(int argc, char **argv)
     write(pipes[start][1], &buffer, sizeof(int));
     close(pipes[start][1]);  // Cerramos el extremo de escritura
 
-    // Esperar a que todos los procesos hijos terminen
-    for (int i = 0; i < n; i++) {
-        wait(NULL);
-    }
+    // Esperar a que el último proceso hijo termine
+    waitpid(last_child_pid, NULL, 0);
 
     // Leer el mensaje final del proceso padre
     printf("Proceso padre está a punto de leer el mensaje final\n");
