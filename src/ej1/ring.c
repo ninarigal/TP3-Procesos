@@ -246,7 +246,7 @@ int main(int argc, char **argv)
             close(pipes[i][1]);  // Cerramos el extremo de escritura
 
             // Paso 4: Transmisión del mensaje
-            if ((i + 1) % n == start) {
+            if (i == start) {
                 // Proceso inicial, envía el mensaje
                 printf("Proceso %d recibió el mensaje %d\n", i, buffer[0]);
                 message = buffer[0];
