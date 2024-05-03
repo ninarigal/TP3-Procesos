@@ -158,15 +158,15 @@ int main(int argc, char **argv)
     write(pipes[start][1], &buffer, sizeof(int));
     close(pipes[start][1]);  // Cerramos el extremo de escritura
 
-    // Esperar a que todos los hijos terminen de enviar los mensajes
-    for (int i = 0; i < n; i++) {
-        wait(NULL);
-    }
+   // Esperar a que todos los hijos terminen de enviar los mensajes
+	for (int i = 0; i < n; i++) {
+		wait(NULL);
+	}
 
-    // Proceso padre recibe el mensaje final del último hijo
-    read(pipes[(start + n - 1) % n][0], &buffer, sizeof(int));
-    printf("El valor final es: %d\n", buffer[0]);
-    close(pipes[(start + n - 1) % n][0]);  // Cerramos el extremo de lectura
+	// Proceso padre recibe el mensaje final del último hijo
+	read(pipes[(start + n - 1) % n][0], &buffer, sizeof(int));
+	printf("El valor final es: %d\n", buffer[0]);
+	return 0;
 }
 
 // Para compilar: gcc -o ring ring.c
