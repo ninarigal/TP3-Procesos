@@ -20,7 +20,7 @@ por última vez y lo envía de vuelta al proceso padre. Este último debe mostra
 
 int main(int argc, char **argv)
 {	
-	int start, status, pid, n;
+	int start, status, pid, n, last_child_pid;
 	int buffer[1];
 
 	if (argc != 4){ printf("Uso: anillo <n> <c> <s> \n"); exit(0);}
@@ -148,7 +148,7 @@ int main(int argc, char **argv)
             }
         } else {  // Proceso padre
             if (i == n - 1) { // Si es el último proceso hijo, guardamos su PID
-				int last_child_pid = pid;
+				last_child_pid = pid;
             }
             close(pipes[i][0]);  // Cerramos el extremo de lectura
         }
