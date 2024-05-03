@@ -188,7 +188,6 @@ int main(int argc, char **argv)
             if (i == start) { 
 				read(pipes[i][0], &buffer, sizeof(int));
 				printf("Proceso %d recibió el mensaje %d\n", i, buffer[0]);
-				buffer[0]++;
 			} else {
 				read(pipes[i][0], &buffer, sizeof(int));
 				printf("Proceso %d recibió el mensaje %d\n", i, buffer[0]);
