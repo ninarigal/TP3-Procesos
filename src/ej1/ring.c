@@ -233,6 +233,13 @@ int main(int argc, char **argv)
     pid_t pid;
     int message;
 
+	for (int i = 0; i < n; i++) {
+		if (pipe(pipes[i]) == -1) {
+			perror("Error en la creación del pipe");
+			exit(EXIT_FAILURE);
+		}
+	}
+
     for (int i = 0; i < n; i++) {
         pipe(pipes[i]);
         pid = fork();
@@ -275,13 +282,6 @@ int main(int argc, char **argv)
         }
     }
 
-    // Paso 3: Establecimiento de pipes
-	for (int i = 0; i < n; i++) {
-		if (pipe(pipes[i]) == -1) {
-			perror("Error en la creación del pipe");
-			exit(EXIT_FAILURE);
-		}
-	}
     // Paso 4: Transmisión del mensaje (Proceso inicial)
     printf("Proceso padre envía el mensaje %d al proceso %d\n", buffer[0], start);
     write(pipes[start][1], &buffer, sizeof(int));
