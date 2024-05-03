@@ -221,9 +221,9 @@ int main(int argc, char **argv)
     // Paso 5: Finalización de la comunicación (Proceso inicial)
     for (int i = 0; i < n; i++) {
 		wait(NULL);
-		close(pipes[i][1]);  // Cerramos el extremo de escritura
+		// close(pipes[i][1]);  // Cerramos el extremo de escritura
 	}
-    // close(pipes[start][1]);  // Cerramos el extremo de escritura
+    close(pipes[start][1]);  // Cerramos el extremo de escritura
 
 	// Paso 6: Finalización de la comunicación (Proceso padre)
 	read(pipes[start][0], &buffer, sizeof(int));
