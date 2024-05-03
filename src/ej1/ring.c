@@ -185,29 +185,28 @@ int main(int argc, char **argv)
             close(pipes[i][1]);  // Cerramos el extremo de escritura
 
             // Paso 4: Transmisión del mensaje
-            if (i == start) { // i == start
-                // Proceso inicial, envía el mensaje
-                read(pipes[i][0], &buffer, sizeof(int));
-                printf("Proceso %d recibió el mensaje %d\n", i, buffer[0]);
-            } else {
-                // Proceso intermediario, recibe el mensaje, lo incrementa y lo envía
-                read(pipes[i][0], &buffer, sizeof(int));
-                printf("Proceso %d recibió el mensaje %d\n", i, buffer[0]);
-                buffer[0]++;
-            }
+            if (i == start) { 
+				read(pipes[i][0], &buffer, sizeof(int));
+				printf("Proceso %d recibió el mensaje %d\n", i, buffer[0]);
+			} else {
+				read(pipes[i][0], &buffer, sizeof(int));
+				printf("Proceso %d recibió el mensaje %d\n", i, buffer[0]);
+				buffer[0]++;
+			}
 
-            // Paso 5: Finalización de la comunicación
-            if (i == (start - 1) % n) {
-                printf("Proceso %d envía el mensaje %d al proceso padre\n", i, buffer[0]);
-                close(pipes[i][0]);  // Cerramos el extremo de lectura
-                exit(EXIT_SUCCESS);
-            } else {
-                printf("Proceso %d envía el mensaje %d al siguiente proceso\n", i, buffer[0]);
-                write(pipes[(i + 1) % n][1], &buffer, sizeof(int));
-                close(pipes[i][0]);  // Cerramos el extremo de lectura
-                close(pipes[(i + 1) % n][1]);  // Cerramos el extremo de escritura
-                exit(EXIT_SUCCESS);
-            }
+			// Corregir la condición para identificar el proceso que envía el mensaje de vuelta al padre
+			if (i == (start + n - 1) % n) {
+				printf("Proceso %d envía el mensaje %d al proceso padre\n", i, buffer[0]);
+				close(pipes[i][0]);  
+				write(pipes[start][1], &buffer, sizeof(int)); // Envía el mensaje al proceso padre
+				exit(EXIT_SUCCESS);
+			} else {
+				printf("Proceso %d envía el mensaje %d al siguiente proceso\n", i, buffer[0]);
+				write(pipes[(i + 1) % n][1], &buffer, sizeof(int));
+				close(pipes[i][0]);  
+				close(pipes[(i + 1) % n][1]);  
+				exit(EXIT_SUCCESS);
+			}
         } else {  // Proceso padre
             close(pipes[i][0]);  // Cerramos el extremo de lectura
         }
