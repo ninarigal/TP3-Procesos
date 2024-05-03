@@ -162,6 +162,7 @@ int main(int argc, char **argv)
     }
 
     // Leer el mensaje final del proceso padre
+    printf("Proceso padre está a punto de leer el mensaje final\n");
     read(pipes[start][0], &buffer, sizeof(int));
     printf("Proceso padre recibió el mensaje final %d\n", buffer[0]);
     close(pipes[start][0]);
@@ -174,3 +175,4 @@ int main(int argc, char **argv)
 
     return 0;
 }
+
