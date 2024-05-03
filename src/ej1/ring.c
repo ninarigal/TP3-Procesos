@@ -169,8 +169,69 @@ int main(int argc, char **argv)
 
 //     return 0;
 
+	// int pipes[n][2];
+    // pid_t pid;
+
+    // for (int i = 0; i < n; i++) {
+    //     pipe(pipes[i]);
+    //     pid = fork();
+
+    //     if (pid < 0) {
+    //         perror("Error en la creación del proceso");
+    //         exit(EXIT_FAILURE);
+    //     }
+
+    //     if (pid == 0) {  // Proceso hijo
+    //         close(pipes[i][1]);  // Cerramos el extremo de escritura
+
+    //         // Paso 4: Transmisión del mensaje
+    //         if (i == start) { // i == start
+    //             // Proceso inicial, envía el mensaje
+    //             read(pipes[i][0], &buffer, sizeof(int));
+    //             printf("Proceso %d recibió el mensaje %d\n", i, buffer[0]);
+    //         } else {
+    //             // Proceso intermediario, recibe el mensaje, lo incrementa y lo envía
+    //             read(pipes[i][0], &buffer, sizeof(int));
+    //             printf("Proceso %d recibió el mensaje %d\n", i, buffer[0]);
+    //             buffer[0]++;
+    //         }
+
+    //         // Paso 5: Finalización de la comunicación
+    //         if (i == (start - 1) % n) {
+    //             printf("Proceso %d envía el mensaje %d al proceso padre\n", i, buffer[0]);
+    //             close(pipes[i][0]);  // Cerramos el extremo de lectura
+    //             exit(EXIT_SUCCESS);
+    //         } else {
+    //             printf("Proceso %d envía el mensaje %d al siguiente proceso\n", i, buffer[0]);
+    //             write(pipes[(i + 1) % n][1], &buffer, sizeof(int));
+    //             close(pipes[i][0]);  // Cerramos el extremo de lectura
+    //             close(pipes[(i + 1) % n][1]);  // Cerramos el extremo de escritura
+    //             exit(EXIT_SUCCESS);
+    //         }
+    //     } else {  // Proceso padre
+    //         close(pipes[i][0]);  // Cerramos el extremo de lectura
+    //     }
+    // }
+
+    // // Paso 3: Establecimiento de pipes
+    // // Paso 4: Transmisión del mensaje (Proceso inicial)
+    // printf("Proceso padre envía el mensaje %d al proceso %d\n", buffer[0], start);
+    // write(pipes[start][1], &buffer, sizeof(int));
+
+    // // Paso 5: Finalización de la comunicación (Proceso inicial)
+    // wait(NULL);
+    // close(pipes[start][1]);  // Cerramos el extremo de escritura
+
+	// // Paso 6: Finalización de la comunicación (Proceso padre)
+	// read(pipes[start][0], &buffer, sizeof(int));
+	// printf("El valor final es: %d\n", buffer[0]);
+	// close(pipes[start][0]);  // Cerramos el extremo de lectura
+
+    // return 0;
+
 	int pipes[n][2];
     pid_t pid;
+    int message;
 
     for (int i = 0; i < n; i++) {
         pipe(pipes[i]);
@@ -185,49 +246,61 @@ int main(int argc, char **argv)
             close(pipes[i][1]);  // Cerramos el extremo de escritura
 
             // Paso 4: Transmisión del mensaje
-            if (i == start) { // i == start
+            if ((i + 1) % n == start) {
                 // Proceso inicial, envía el mensaje
-                read(pipes[i][0], &buffer, sizeof(int));
                 printf("Proceso %d recibió el mensaje %d\n", i, buffer[0]);
+                message = buffer[0];
             } else {
                 // Proceso intermediario, recibe el mensaje, lo incrementa y lo envía
-                read(pipes[i][0], &buffer, sizeof(int));
-                printf("Proceso %d recibió el mensaje %d\n", i, buffer[0]);
-                buffer[0]++;
+                read(pipes[i][0], &message, sizeof(int));
+                printf("Proceso %d recibió el mensaje %d\n", i, message);
+                message++;
             }
 
             // Paso 5: Finalización de la comunicación
-            if (i == (start - 1) % n) {
-                printf("Proceso %d envía el mensaje %d al proceso padre\n", i, buffer[0]);
+            if (i == start) {
+                printf("Proceso %d envía el mensaje %d al proceso padre\n", i, message);
+                write(pipes[i][1], &message, sizeof(int));
                 close(pipes[i][0]);  // Cerramos el extremo de lectura
-                exit(EXIT_SUCCESS);
             } else {
-                printf("Proceso %d envía el mensaje %d al siguiente proceso\n", i, buffer[0]);
-                write(pipes[(i + 1) % n][1], &buffer, sizeof(int));
+                printf("Proceso %d envía el mensaje %d al siguiente proceso\n", i, message);
+                write(pipes[(i + 1) % n][1], &message, sizeof(int));
                 close(pipes[i][0]);  // Cerramos el extremo de lectura
                 close(pipes[(i + 1) % n][1]);  // Cerramos el extremo de escritura
-                exit(EXIT_SUCCESS);
             }
+
+            exit(EXIT_SUCCESS);
         } else {  // Proceso padre
             close(pipes[i][0]);  // Cerramos el extremo de lectura
         }
     }
 
     // Paso 3: Establecimiento de pipes
+	for (int i = 0; i < n; i++) {
+		if (pipe(pipes[i]) == -1) {
+			perror("Error en la creación del pipe");
+			exit(EXIT_FAILURE);
+		}
+	}
     // Paso 4: Transmisión del mensaje (Proceso inicial)
     printf("Proceso padre envía el mensaje %d al proceso %d\n", buffer[0], start);
     write(pipes[start][1], &buffer, sizeof(int));
 
     // Paso 5: Finalización de la comunicación (Proceso inicial)
-    wait(NULL);
     close(pipes[start][1]);  // Cerramos el extremo de escritura
 
-	// Paso 6: Finalización de la comunicación (Proceso padre)
-	read(pipes[start][0], &buffer, sizeof(int));
-	printf("El valor final es: %d\n", buffer[0]);
-	close(pipes[start][0]);  // Cerramos el extremo de lectura
+    // Espera a que todos los procesos hijos terminen
+    for (int i = 0; i < n; i++) {
+        wait(NULL);
+    }
+
+    // Lectura del mensaje final del proceso padre
+    read(pipes[start][0], &message, sizeof(int));
+    printf("El valor final es: %d\n", message);
+    close(pipes[start][0]);  // Cerramos el extremo de lectura
 
     return 0;
+
 }
 
 // Para compilar: gcc -o ring ring.c
