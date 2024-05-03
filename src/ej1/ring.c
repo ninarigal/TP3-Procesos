@@ -183,9 +183,9 @@ int main(int argc, char **argv)
 
 	// Leer el mensaje final del último proceso hijo
 	printf("Proceso padre está a punto de leer el mensaje final\n");
-	read(fds[(start + n - 1) % n][0], &buffer, sizeof(int));
+	read(fds[start + 2][0], &buffer, sizeof(int));
 	printf("Proceso padre recibió el mensaje final %d\n", buffer[0]);
-	close(fds[(start + n - 1) % n][0]);
+	close(fds[start + 2][0]);
 
 
     return 0;
