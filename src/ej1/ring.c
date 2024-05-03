@@ -185,7 +185,7 @@ int main(int argc, char **argv)
             close(pipes[i][1]);  // Cerramos el extremo de escritura
 
             // Paso 4: Transmisión del mensaje
-            if (i == start) {
+            if ((i + 1) % n == start) { // i == start
                 // Proceso inicial, envía el mensaje
                 read(pipes[i][0], &buffer, sizeof(int));
                 printf("Proceso %d recibió el mensaje %d\n", i, buffer[0]);
@@ -221,6 +221,11 @@ int main(int argc, char **argv)
     // Paso 5: Finalización de la comunicación (Proceso inicial)
     wait(NULL);
     close(pipes[start][1]);  // Cerramos el extremo de escritura
+
+	// Paso 6: Finalización de la comunicación (Proceso padre)
+	read(pipes[start][0], &buffer, sizeof(int));
+	printf("El valor final es: %d\n", buffer[0]);
+	close(pipes[start][0]);  // Cerramos el extremo de lectura
 
     return 0;
 }
