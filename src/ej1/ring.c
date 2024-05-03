@@ -20,7 +20,7 @@ por última vez y lo envía de vuelta al proceso padre. Este último debe mostra
 
 int main(int argc, char **argv)
 {	
-	int start, status, n;
+	int start, n;
 	int buffer[1];
 
 	if (argc != 4){ printf("Uso: anillo <n> <c> <s> \n"); exit(0);}
@@ -151,14 +151,31 @@ int main(int argc, char **argv)
     write(pipes[start][1], &buffer, sizeof(int));
     close(pipes[start][1]);  // Cerramos el extremo de escritura
 
-   // Esperar a que todos los hijos terminen de enviar los mensajes
-	for (int i = 0; i < n; i++) {
-		wait(NULL);
+//    // Esperar a que todos los hijos terminen de enviar los mensajes
+// 	for (int i = 0; i < n; i++) {
+// 		wait(NULL);
+// 	}
+
+// 	// Proceso padre recibe el mensaje final del último hijo
+// 	read(pipes[(start + n - 1) % n][0], &buffer, sizeof(int));
+// 	printf("El valor final es: %d\n", buffer[0]);
+
+	// Finalización de la comunicación (Proceso inicial)
+    for (int i = 0; i < n; i++) {
+		// wait(NULL);
+		close(pipes[i][1]);  // Cerramos el extremo de escritura
 	}
 
-	// Proceso padre recibe el mensaje final del último hijo
-	read(pipes[(start + n - 1) % n][0], &buffer, sizeof(int));
+	for (int i = 0; i < n; i++) {
+		wait(NULL);
+		// close(pipes[i][1]);  // Cerramos el extremo de escritura
+	}
+    // close(pipes[start][1]);  // Cerramos el extremo de escritura
+
+	// Paso 6: Finalización de la comunicación (Proceso padre)
+	read(pipes[start][0], &buffer, sizeof(int));
 	printf("El valor final es: %d\n", buffer[0]);
+	close(pipes[start][0]);  // Cerramos el extremo de lectura
 }
 
 // Para compilar: gcc -o ring ring.c
