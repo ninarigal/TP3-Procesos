@@ -87,26 +87,21 @@ int main(int argc, char **argv)
     write(pipes[start][1], &buffer, sizeof(int));
     close(pipes[start][1]);  // Cerramos el extremo de escritura
 
-	// // Esperar a que los procesos hijos terminen
-	// for (int i = 0; i < n; i++) {
-	// 	wait(NULL);
-	// }
+	// Esperar a que los procesos hijos terminen
+	for (int i = 0; i < n; i++) {
+		wait(NULL);
+	}
 
-	// // Cerrar los pipes
-	// for (int i = 0; i < n; i++) {
-	// 	close(pipes[i][0]);
-	// 	close(pipes[i][1]);
-	// }
+	// Cerrar los pipes
+	for (int i = 0; i < n; i++) {
+		close(pipes[i][0]);
+		close(pipes[i][1]);
+	}
 
-	// // Leer el mensaje final del proceso padre
-	// read(pipes[start][0], &buffer, sizeof(int));
-	// printf("Proceso padre recibió el mensaje %d\n", buffer[0]);
-	// close(pipes[start][0]);
-
-	waitpid(-1, &status, 0);
-    read(pipes[0][0], buffer, sizeof(buffer));
-    printf("El valor final es: %i\n", buffer[0]);
-
+	// Leer el mensaje final del proceso padre
+	read(pipes[start][0], &buffer, sizeof(int));
+	printf("Proceso padre recibió el mensaje %d\n", buffer[0]);
+	close(pipes[start][0]);
 
 	return 0;
 }
