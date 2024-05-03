@@ -93,6 +93,12 @@ int main(int argc, char **argv)
 		wait(NULL);
 	}
 
+	// Cerrar los pipes
+	for (int i = 0; i < n; i++) {
+		close(pipes[i][0]);
+		close(pipes[i][1]);
+	}
+
 	// Leer el mensaje final del proceso padre
 	read(pipes[start][0], &buffer, sizeof(int));
 	printf("Proceso padre recibió el mensaje %d\n", buffer[0]);
