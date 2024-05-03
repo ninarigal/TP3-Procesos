@@ -147,7 +147,7 @@ int main(int argc, char **argv)
                 exit(EXIT_SUCCESS);
             }
         } else {  // Proceso padre
-            if (i == (i + 1) % n) { // Si es el último proceso hijo, guardamos su PID
+            if (i == (start + n - 1) % n) { // Si es el último proceso hijo, guardamos su PID
 				last_child_pid = pid;
             }
             close(fds[i][0]);  // Cerramos el extremo de lectura
