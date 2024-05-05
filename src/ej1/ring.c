@@ -152,7 +152,7 @@ int main(int argc, char **argv)
 				// close(fds[start][1]);
                 // exit(EXIT_SUCCESS);
 				write(fds_last[1], &buffer, sizeof(int)); // Enviamos el mensaje al proceso padre
-				close(fds[0]);
+				close(fds_last[0]);
 				close(fds_last[1]);
 				exit(EXIT_SUCCESS);
             } else {
