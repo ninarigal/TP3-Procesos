@@ -151,6 +151,7 @@ int main(int argc, char **argv)
                 // close(fds[i][0]);
 				// close(fds[start][1]);
                 // exit(EXIT_SUCCESS);
+                printf("Proceso %d envía el mensaje %d al proceso padre\n", i, buffer[0]);
 				write(fds_last[1], &buffer, sizeof(int)); // Enviamos el mensaje al proceso padre
 				close(fds_last[0]);
 				close(fds_last[1]);
