@@ -116,7 +116,7 @@ int main(int argc, char **argv)
             exit(EXIT_FAILURE);
         }
 		
-		if (pipe(fds_last[i]) == -1) {
+		if (pipe(fds_last) == -1) {
 			perror("Error en la creación de pipes");
 			exit(EXIT_FAILURE);
 		}
