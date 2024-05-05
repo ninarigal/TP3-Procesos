@@ -152,6 +152,6 @@ int main() {
         //         close(pipes[0]);  // Cerramos el extremo de lectura
         //     }
         // }    
-    }
-    return 0;
+    // }
+    // return 0;
 }
