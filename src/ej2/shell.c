@@ -57,6 +57,13 @@ int main() {
             commands[command_count++] = token;
             token = strtok(NULL, "|");
         }
+        /* You should start programming from here... */
+        
+        // Check if any commands were provided
+        if (command_count == 0) {
+            printf("No se ingresaron comandos.\n");
+            continue;
+        }
 
         // Add a NULL pointer to indicate the end of the commands array
         commands[command_count] = NULL;
@@ -119,39 +126,64 @@ int main() {
 
     return 0;
 
+    //     // Add a NULL pointer to indicate the end of the commands array
+    //     commands[command_count] = NULL;
 
-        /* You should start programming from here... */
-        // for (int i = 0; i < command_count; i++) 
-        // {
-        //     printf("Command %d: %s\n", i, commands[i]);
-        
-        //     // Crear pipes
-        //     int pipes[2];
-        //     if (pipe(pipes) == -1) {
-        //         perror("Error en la creación de pipes");
-        //         exit(EXIT_FAILURE);
-        //     }
+    //     // Create pipes for inter-process communication
+    //     int pipes[2 * (command_count - 1)];
+    //     for (int i = 0; i < command_count - 1; i++) {
+    //         if (pipe(pipes + i * 2) == -1) {
+    //             perror("pipe");
+    //             exit(EXIT_FAILURE);
+    //         }
+    //     }
 
-        //     // Crear proceso hijo
-        //     pid_t pid = fork();
-        //     if (pid < 0) {
-        //         perror("Error en la creación del proceso hijo");
-        //         exit(EXIT_FAILURE);
-        //     }
+    //     // Execute commands in child processes
+    //     for (int i = 0; i < command_count; i++) {
+    //         pid_t pid = fork();
+    //         if (pid == -1) {
+    //             perror("fork");
+    //             exit(EXIT_FAILURE);
+    //         } else if (pid == 0) {  // Child process
+    //             // Set up input redirection
+    //             if (i != 0) {
+    //                 if (dup2(pipes[(i - 1) * 2], STDIN_FILENO) == -1) {
+    //                     perror("dup2");
+    //                     exit(EXIT_FAILURE);
+    //                 }
+    //             }
+    //             // Set up output redirection
+    //             if (i != command_count - 1) {
+    //                 if (dup2(pipes[i * 2 + 1], STDOUT_FILENO) == -1) {
+    //                     perror("dup2");
+    //                     exit(EXIT_FAILURE);
+    //                 }
+    //             }
+    //             // Close all pipe descriptors
+    //             for (int j = 0; j < 2 * (command_count - 1); j++) {
+    //                 close(pipes[j]);
+    //             }
+    //             // Execute the command
+    //             execlp(commands[i], commands[i], NULL);
+    //             // If execlp returns, there was an error
+    //             perror("execlp");
+    //             exit(EXIT_FAILURE);
+    //         }
+    //     }
 
-        //     if (pid == 0) {  // Proceso hijo
-        //         close(pipes[0]);  // Cerramos el extremo de lectura
-        //         dup2(pipes[1], STDOUT_FILENO);  // Redirigimos la salida estándar al pipe
-        //         close(pipes[1]);  // Cerramos el extremo de escritura
-        //         execlp(commands[i], commands[i], NULL);  // Ejecutamos el comando
-        //         perror("Error en la ejecución del comando");
-        //         exit(EXIT_FAILURE);
-        //     } else {  // Proceso padre
-        //         close(pipes[1]);  // Cerramos el extremo de escritura
-        //         waitpid(pid, NULL, 0);  // Esperamos a que el proceso hijo termine
-        //         close(pipes[0]);  // Cerramos el extremo de lectura
-        //     }
-        // }    
+    //     // Close all pipe descriptors in the parent process
+    //     for (int i = 0; i < 2 * (command_count - 1); i++) {
+    //         close(pipes[i]);
+    //     }
+
+    //     // Wait for all child processes to finish
+    //     for (int i = 0; i < command_count; i++) {
+    //         wait(NULL);
+    //     }
+
+    //     // Reset command count for the next iteration
+    //     command_count = 0;
     // }
+
     // return 0;
 }
