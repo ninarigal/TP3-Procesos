@@ -107,6 +107,7 @@ int main(int argc, char **argv)
 // }
 
 	int fds[n][2];
+	// int fds_last[n][2];
 
     // Crear los pipes
     for (int i = 0; i < n; i++) {
@@ -114,7 +115,17 @@ int main(int argc, char **argv)
             perror("Error en la creación de pipes");
             exit(EXIT_FAILURE);
         }
+		
+		// if (pipe(fds_last[i]) == -1) {
+		// 	perror("Error en la creación de pipes");
+		// 	exit(EXIT_FAILURE);
+		// }
     }
+
+	// Proceso padre envía el mensaje inicial al primer hijo
+    printf("Proceso padre envía el mensaje %d al proceso %d\n", buffer[0], start);
+    write(fds[start][1], &buffer, sizeof(int));
+    close(fds[start][1]);  // Cerramos el extremo de escritura
 
     // Crear procesos hijos
     for (int i = 0; i < n; i++) {
@@ -154,11 +165,6 @@ int main(int argc, char **argv)
             close(fds[i][0]);  // Cerramos el extremo de lectura
         }
     }
-
-    // Proceso padre envía el mensaje inicial al primer hijo
-    printf("Proceso padre envía el mensaje %d al proceso %d\n", buffer[0], start);
-    write(fds[start][1], &buffer, sizeof(int));
-    close(fds[start][1]);  // Cerramos el extremo de escritura
 
     // Esperar a que el último proceso hijo termine
     waitpid(last_child_pid, NULL, 0);
