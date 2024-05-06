@@ -58,6 +58,74 @@ int main() {
             token = strtok(NULL, "|");
         }
         /* You should start programming from here... */
+
+        int fds[command_count][2];
+        int pids[command_count];
+
+        for (int i = 0; i < command_count; i++) {
+            if (pipe(fds[i]) == -1) {
+                perror("pipe");
+                exit(EXIT_FAILURE);
+            }
+        }
+
+        for (int i = 0; i < command_count; i++) {
+            pids[i] = fork();
+            if (pids[i] == -1) {
+                perror("fork");
+                exit(EXIT_FAILURE);
+            } else if (pids[i] == 0) {  // Child process
+                if (i != 0) {
+                    close(fds[i - 1][1]);
+                    if (dup2(fds[i - 1][0], STDIN_FILENO) == -1) {
+                        perror("dup2");
+                        exit(EXIT_FAILURE);
+                    }
+                    close(fds[i - 1][0]);
+                }
+                if (i != command_count - 1) {
+                    close(fds[i][0]);
+                    if (dup2(fds[i][1], STDOUT_FILENO) == -1) {
+                        perror("dup2");
+                        exit(EXIT_FAILURE);
+                    }
+                    close(fds[i][1]);
+                }
+                for (int j = 0; j < command_count; j++) {
+                    close(fds[j][0]);
+                    close(fds[j][1]);
+                }
+                
+                token = strtok(commands[i], " ");
+                char *args[256];
+                int arg_count = 0;
+                int i = 0;
+                while ((token != NULL) && (i < MAX_COMMANDS)) {
+                    // saco las dos comillas de cada lado
+                    if (token[0] == '\"') {
+                        token++;
+                    }
+                    if (token[strlen(token) - 1] == '\"') {
+                        token[strlen(token) - 1] = '\0';
+                    }
+                    args[i++] = token;
+                    token = strtok(NULL, " "); 
+                }
+                
+                args[i] = NULL;
+                execvp(args[0], args);
+                perror("execvp");
+                exit(EXIT_FAILURE);
+    
+            }
+
+        }
+
+        for (int i = 0; i < command_count; i++) {
+            close(fds[i][0]);
+            close(fds[i][1]);
+            waitpid(pids[i], NULL, 0);
+        }
         
     //     // Check if any commands were provided
     //     if (command_count == 0) {
@@ -125,61 +193,5 @@ int main() {
     // }
 
     // return 0;
-    // Create pipes for inter-process communication
-        int pipes[2 * (command_count - 1)];
-        for (int i = 0; i < command_count - 1; i++) {
-            if (pipe(pipes + i * 2) == -1) {
-                perror("pipe");
-                exit(EXIT_FAILURE);
-            }
-        }
-
-        // Execute commands in child processes
-        for (int i = 0; i < command_count; i++) {
-            pid_t pid = fork();
-            if (pid == -1) {
-                perror("fork");
-                exit(EXIT_FAILURE);
-            } else if (pid == 0) {  // Child process
-                // Set up input redirection
-                if (i != 0) {
-                    if (dup2(pipes[(i - 1) * 2], STDIN_FILENO) == -1) {
-                        perror("dup2");
-                        exit(EXIT_FAILURE);
-                    }
-                }
-                // Set up output redirection
-                if (i != command_count - 1) {
-                    if (dup2(pipes[i * 2 + 1], STDOUT_FILENO) == -1) {
-                        perror("dup2");
-                        exit(EXIT_FAILURE);
-                    }
-                }
-                // Close all pipe descriptors
-                for (int j = 0; j < 2 * (command_count - 1); j++) {
-                    close(pipes[j]);
-                }
-                // Execute the command
-                execlp(commands[i], commands[i], NULL);
-                // If execlp returns, there was an error
-                perror("execlp");
-                exit(EXIT_FAILURE);
-            }
-        }
-
-        // Close all pipe descriptors in the parent process
-        for (int i = 0; i < 2 * (command_count - 1); i++) {
-            close(pipes[i]);
-        }
-
-        // Wait for all child processes to finish
-        for (int i = 0; i < command_count; i++) {
-            wait(NULL);
-        }
-
-        // Reset command count for the next iteration
-        command_count = 0;
-    }
-
-    return 0;
+    
 }
