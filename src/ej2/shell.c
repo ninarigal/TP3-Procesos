@@ -59,72 +59,11 @@ int main() {
         }
         /* You should start programming from here... */
         
-        // Check if any commands were provided
-        if (command_count == 0) {
-            printf("No se ingresaron comandos.\n");
-            continue;
-        }
-
-        // Add a NULL pointer to indicate the end of the commands array
-        commands[command_count] = NULL;
-
-        // Create pipes for inter-process communication
-        int pipes[2 * (command_count - 1)];
-        for (int i = 0; i < command_count - 1; i++) {
-            if (pipe(pipes + i * 2) == -1) {
-                perror("pipe");
-                exit(EXIT_FAILURE);
-            }
-        }
-
-        // Execute commands in child processes
-        for (int i = 0; i < command_count; i++) {
-            pid_t pid = fork();
-            if (pid == -1) {
-                perror("fork");
-                exit(EXIT_FAILURE);
-            } else if (pid == 0) {  // Child process
-                // Set up input redirection
-                if (i != 0) {
-                    if (dup2(pipes[(i - 1) * 2], STDIN_FILENO) == -1) {
-                        perror("dup2");
-                        exit(EXIT_FAILURE);
-                    }
-                }
-                // Set up output redirection
-                if (i != command_count - 1) {
-                    if (dup2(pipes[i * 2 + 1], STDOUT_FILENO) == -1) {
-                        perror("dup2");
-                        exit(EXIT_FAILURE);
-                    }
-                }
-                // Close all pipe descriptors
-                for (int j = 0; j < 2 * (command_count - 1); j++) {
-                    close(pipes[j]);
-                }
-                // Execute the command
-                execlp(commands[i], commands[i], NULL);
-                // If execlp returns, there was an error
-                perror("execlp");
-                exit(EXIT_FAILURE);
-            }
-        }
-
-        // Close all pipe descriptors in the parent process
-        for (int i = 0; i < 2 * (command_count - 1); i++) {
-            close(pipes[i]);
-        }
-
-        // Wait for all child processes to finish
-        for (int i = 0; i < command_count; i++) {
-            wait(NULL);
-        }
-
-        // Reset command count for the next iteration
-        command_count = 0;
-    }
-
-    return 0;
+    //     // Check if any commands were provided
+    //     if (command_count == 0) {
+    //         printf("No se ingresaron comandos.\n");
+    //         continue;
+    //     }
 
     //     // Add a NULL pointer to indicate the end of the commands array
     //     commands[command_count] = NULL;
@@ -186,4 +125,61 @@ int main() {
     // }
 
     // return 0;
+    // Create pipes for inter-process communication
+        int pipes[2 * (command_count - 1)];
+        for (int i = 0; i < command_count - 1; i++) {
+            if (pipe(pipes + i * 2) == -1) {
+                perror("pipe");
+                exit(EXIT_FAILURE);
+            }
+        }
+
+        // Execute commands in child processes
+        for (int i = 0; i < command_count; i++) {
+            pid_t pid = fork();
+            if (pid == -1) {
+                perror("fork");
+                exit(EXIT_FAILURE);
+            } else if (pid == 0) {  // Child process
+                // Set up input redirection
+                if (i != 0) {
+                    if (dup2(pipes[(i - 1) * 2], STDIN_FILENO) == -1) {
+                        perror("dup2");
+                        exit(EXIT_FAILURE);
+                    }
+                }
+                // Set up output redirection
+                if (i != command_count - 1) {
+                    if (dup2(pipes[i * 2 + 1], STDOUT_FILENO) == -1) {
+                        perror("dup2");
+                        exit(EXIT_FAILURE);
+                    }
+                }
+                // Close all pipe descriptors
+                for (int j = 0; j < 2 * (command_count - 1); j++) {
+                    close(pipes[j]);
+                }
+                // Execute the command
+                execlp(commands[i], commands[i], NULL);
+                // If execlp returns, there was an error
+                perror("execlp");
+                exit(EXIT_FAILURE);
+            }
+        }
+
+        // Close all pipe descriptors in the parent process
+        for (int i = 0; i < 2 * (command_count - 1); i++) {
+            close(pipes[i]);
+        }
+
+        // Wait for all child processes to finish
+        for (int i = 0; i < command_count; i++) {
+            wait(NULL);
+        }
+
+        // Reset command count for the next iteration
+        command_count = 0;
+    }
+
+    return 0;
 }
