@@ -102,26 +102,17 @@ int main() {
                 int arg_count = 0;
                 token = strtok(commands[i], " ");
                 while (token != NULL && arg_count < 255) {
-                    // Check if the token starts with a single quote
-                    if (token[0] == '\'') {
-                        // If so, keep concatenating tokens until we find the closing single quote
-                        char *quoted_token = strtok(NULL, "'");
-                        if (quoted_token != NULL) {
-                            // Concatenate the token with the quotes
-                            args[arg_count++] = token;
-                            strcat(args[arg_count - 1], " ");
-                            strcat(args[arg_count - 1], quoted_token);
-                        }
-                    } else {
-                        // Otherwise, add the token directly to the argument array
-                        args[arg_count++] = token;
+                    if (token[0] == '\"') {
+                        token++;
                     }
+                    if (token[strlen(token) - 1] == '\"') {
+                        token[strlen(token) - 1] = '\0';
+                    }
+                    args[arg_count++] = token;
                     token = strtok(NULL, " ");
                 }
+                args[arg_count] = NULL;
 
-                args[arg_count] = NULL; // NULL-terminated array
-
-                // Execute the command
                 execvp(args[0], args);
                 perror("execvp");
                 fprintf(stderr, "Failed to execute command: %s\n", args[0]);
@@ -140,79 +131,6 @@ int main() {
 
     return 0;
 }
-
-//         int fds[command_count][2];
-//         int pids[command_count];
-
-//         for (int i = 0; i < command_count; i++) {
-//             if (pipe(fds[i]) == -1) {
-//                 perror("pipe");
-//                 exit(EXIT_FAILURE);
-//             }
-//         }
-
-//         for (int i = 0; i < command_count; i++) {
-//             pids[i] = fork();
-//             if (pids[i] == -1) {
-//                 perror("fork");
-//                 exit(EXIT_FAILURE);
-//             } else if (pids[i] == 0) {  // Child process
-//                 if (i != 0) {
-//                     close(fds[i - 1][1]);
-//                     if (dup2(fds[i - 1][0], STDIN_FILENO) == -1) {
-//                         perror("dup2");
-//                         exit(EXIT_FAILURE);
-//                     }
-//                     close(fds[i - 1][0]);
-//                 }
-//                 if (i != command_count - 1) {
-//                     close(fds[i][0]);
-//                     if (dup2(fds[i][1], STDOUT_FILENO) == -1) {
-//                         perror("dup2");
-//                         exit(EXIT_FAILURE);
-//                     }
-//                     close(fds[i][1]);
-//                 }
-//                 for (int j = 0; j < command_count; j++) {
-//                     if (j != i) {
-//                         close(fds[j][0]);
-//                         close(fds[j][1]);
-//                     }
-//                 }
-
-//                 char *args[256];
-//                 int arg_count = 0;
-//                 token = strtok(commands[i], " ");
-//                 while (token != NULL && arg_count < 255) {
-//                     if (token[0] == '\"') {
-//                         token++;
-//                     }
-//                     if (token[strlen(token) - 1] == '\"') {
-//                         token[strlen(token) - 1] = '\0';
-//                     }
-//                     args[arg_count++] = token;
-//                     token = strtok(NULL, " ");
-//                 }
-//                 args[arg_count] = NULL;
-
-//                 execvp(args[0], args);
-//                 perror("execvp");
-//                 fprintf(stderr, "Failed to execute command: %s\n", args[0]);
-//                 exit(EXIT_FAILURE);
-//             }
-//         }
-
-//         for (int i = 0; i < command_count; i++) {
-//             close(fds[i][0]);
-//             close(fds[i][1]);
-//             waitpid(pids[i], NULL, 0);
-//         }
-
-//         command_count = 0; // Reset command count for next iteration
-//     }
-
-//     return 0;
-// }
 
 
 
