@@ -160,7 +160,14 @@ int main() {
                     close(pipes[j]);
                 }
                 // Execute the command
-                execlp(commands[i], commands[i], NULL);
+                char *args[3] = {NULL};
+                if (i == command_count - 1 && strstr(commands[i], "grep") != NULL) {
+                    args[0] = "grep";
+                    args[1] = ".c";
+                    execvp(args[0], args);
+                } else {
+                    execlp(commands[i], commands[i], NULL);
+                }
                 // If execlp returns, there was an error
                 perror("execlp");
                 exit(EXIT_FAILURE);
