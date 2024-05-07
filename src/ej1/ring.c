@@ -21,7 +21,7 @@ int main(int argc, char **argv)
 	int fds[n][2];
 	int fds_last[2];
 
-    // Crear los pipes
+    // Create pipes
     for (int i = 0; i < n; i++) {
         if (pipe(fds[i]) != 0) {
             fprintf(stderr, "Error en la creación de pipes");
@@ -34,24 +34,24 @@ int main(int argc, char **argv)
             return (-1);
 	}
 
-	// Proceso padre envía el mensaje inicial al primer hijo
+	// Initial message from parent to start process
     printf("Proceso padre envía el mensaje %d al proceso %d\n", buffer[0], start);
     write(fds[start][1], &buffer, sizeof(int));
 
-    // Crear procesos hijos
+    // Create n processes
     for (int i = 0; i < n; i++) {
         pid = fork();
         if (pid < 0) {
             fprintf(stderr, "Error en la creación del proceso");
             return (-1);
         }
-        if (pid == 0) {  // Proceso hijo
+        if (pid == 0) {  // Child process
             if (i != start) {
                 read(fds[i][0], &buffer, sizeof(int));
             }
             printf("Proceso %d recibió el mensaje %d\n", i, buffer[0]);
             buffer[0]++; 
-            if (i == (start + n - 1) % n) { // Último hijo
+            if (i == (start + n - 1) % n) { // Last child
                 printf("Proceso %d envía el mensaje %d al proceso padre\n", i, buffer[0]);
 				write(fds_last[1], &buffer, sizeof(int));;
             } else {
@@ -65,32 +65,30 @@ int main(int argc, char **argv)
 			}
 			close(fds_last[0]);
 			close(fds_last[1]);
-
 			return 0;
 
-        } else {  // Proceso padre
-            if (i == (start + n - 1) % n) { // Si es el último proceso hijo, guardo su PID
+        } else {  // Parent process
+            if (i == (start + n - 1) % n) { // Save last child PID
 				status = pid;
             }
         }
     }
 
-    // Esperar a que el último proceso hijo termine
+    // Wait for last child to finish
     waitpid(status, NULL, 0);
 
-	// Leer el mensaje final del proceso padre
+	// Read last message from last child
 	printf("Proceso padre está a punto de leer el mensaje final\n");
 	read(fds_last[0], &buffer, sizeof(int));
 	printf("Proceso padre recibió el mensaje final %d\n", buffer[0]);
 	close(fds_last[0]);
 	close(fds_last[1]);
 
-    // Cerrar los pipes
+    // Close pipes
     for (int i = 0; i < n; i++) {
         close(fds[i][0]);
         close(fds[i][1]);
     }
-
     return 0;
 }
 
