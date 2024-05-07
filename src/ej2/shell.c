@@ -6,6 +6,15 @@
 
 #define MAX_COMMANDS 200
 
+char *strdup(const char *s) {
+    size_t len = strlen(s) + 1;
+    char *p = malloc(len);
+    if (p != NULL) {
+        memcpy(p, s, len);
+    }
+    return p;
+}
+
 int main() {
 
     char command[256];
