@@ -91,28 +91,29 @@ int main() {
                 //     token = strtok(NULL, " ");
                 // }
                 // args[arg_count] = NULL;
+
                 char *args[256];
                 int arg_count = 0;
-
-                for (int i = 0; i < 2; i++) {
-                    char *token = strtok(commands[i], " ");
-                    while (token != NULL && arg_count < 255) {
-                        if (token[0] == '\'' || token[0] == '\"') {
-                            memmove(token, token + 1, strlen(token)); // Remove leading quote
-                            if (token[strlen(token) - 1] == '\'' || token[strlen(token) - 1] == '\"') {
-                                token[strlen(token) - 1] = '\0'; // Remove trailing quote
-                            }
-                        }
-                        args[arg_count++] = token;
-                        token = strchr(token, ' ');
-                        if (token != NULL) {
-                            *token++ = '\0'; // Null-terminate the current token and move to the next character
-                        }
+                token = strtok(commands[i], " ");
+                int in_quote = 0; // Indica si estamos dentro de comillas
+                while (token != NULL && arg_count < 255) {
+                    if (token[0] == '\'' || token[0] == '\"') {
+                        in_quote = 1;
+                        memmove(token, token + 1, strlen(token)); // Eliminar comillas iniciales
                     }
-                    args[arg_count] = NULL;
-                    arg_count = 0;
+                    if (token[strlen(token) - 1] == '\'' || token[strlen(token) - 1] == '\"') {
+                        in_quote = 0;
+                        token[strlen(token) - 1] = '\0'; // Eliminar comillas finales
+                    }
+                    if (in_quote) {
+                        args[arg_count] = strcat(args[arg_count], " "); // Agregar espacio para tokens entre comillas
+                        args[arg_count] = strcat(args[arg_count], token); // Agregar token a la parte actual del argumento
+                    } else {
+                        args[arg_count++] = token;
+                    }
+                    token = strtok(NULL, " ");
                 }
-
+                args[arg_count] = NULL;
 
                 execvp(args[0], args);
                 perror("execvp");
