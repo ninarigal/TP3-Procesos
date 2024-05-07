@@ -37,7 +37,7 @@ int main(int argc, char **argv)
 	// Proceso padre envía el mensaje inicial al primer hijo
     printf("Proceso padre envía el mensaje %d al proceso %d\n", buffer[0], start);
     write(fds[start][1], &buffer, sizeof(int));
-    close(fds[start][1]); 
+    // close(fds[start][1]); 
 
     // Crear procesos hijos
     for (int i = 0; i < n; i++) {
@@ -47,7 +47,6 @@ int main(int argc, char **argv)
             return (-1);
         }
         if (pid == 0) {  // Proceso hijo
-            close(fds[i][1]);  
             if (i != start) {
                 read(fds[i][0], &buffer, sizeof(int));
             }
@@ -85,6 +84,7 @@ int main(int argc, char **argv)
 	read(fds_last[0], &buffer, sizeof(int));
 	printf("Proceso padre recibió el mensaje final %d\n", buffer[0]);
 	close(fds_last[0]);
+	close(fds_last[1]);
 
     // Cerrar los pipes
     for (int i = 0; i < n; i++) {
