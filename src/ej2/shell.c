@@ -113,12 +113,13 @@ int main() {
                         strcpy(arg_buffer, token + 1); // Copiar el token sin la comilla inicial
 
                         if (token[strlen(token) - 1] == '\'' || token[strlen(token) - 1] == '\"') {
+                            printf("Entre");
                             args[arg_count++] = strdup(arg_buffer); // Agregar el argumento completo al array de argumentos
                             in_quotes = 0; // Restablecer el estado de comillas
                             arg_buffer[0] = '\0'; // Reiniciar el buffer
                         }
 
-                        
+
                     } else if (in_quotes && (token[strlen(token) - 1] == '\'' || token[strlen(token) - 1] == '\"')) {
                         strcat(arg_buffer, " "); // Agregar espacio si es necesario
                         strncat(arg_buffer, token, strlen(token) - 1); // Concatenar el token sin la comilla final
