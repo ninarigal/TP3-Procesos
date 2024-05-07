@@ -93,28 +93,26 @@ int main() {
                 // args[arg_count] = NULL;
                 char *args[256];
                 int arg_count = 0;
-                int in_quote = 0;
-                char *start = commands[i];
-                char *end = commands[i];
 
-                while (*end != '\0' && arg_count < MAX_COMMANDS) {
-                    if (*end == '\"') {
-                        in_quote = !in_quote; // Cambiamos el estado de comillas dobles
+                for (int i = 0; i < 2; i++) {
+                    char *token = strtok(commands[i], " ");
+                    while (token != NULL && arg_count < 255) {
+                        if (token[0] == '\'' || token[0] == '\"') {
+                            memmove(token, token + 1, strlen(token)); // Remove leading quote
+                            if (token[strlen(token) - 1] == '\'' || token[strlen(token) - 1] == '\"') {
+                                token[strlen(token) - 1] = '\0'; // Remove trailing quote
+                            }
+                        }
+                        args[arg_count++] = token;
+                        token = strchr(token, ' ');
+                        if (token != NULL) {
+                            *token++ = '\0'; // Null-terminate the current token and move to the next character
+                        }
                     }
-                    if (*end == ' ' && !in_quote) {
-                        *end = '\0'; // Terminamos el argumento actual
-                        args[arg_count++] = start; // Guardamos el argumento
-                        start = end + 1; // Movemos el puntero de inicio al siguiente caracter
-                    }
-                    end++;
+                    args[arg_count] = NULL;
+                    arg_count = 0;
                 }
 
-                // Si hay un argumento después del último espacio o al final de la cadena
-                if (end != start) {
-                    args[arg_count++] = start; // Guardamos el último argumento
-                }
-
-                args[arg_count] = NULL;
 
                 execvp(args[0], args);
                 perror("execvp");
