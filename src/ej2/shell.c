@@ -113,19 +113,6 @@ int main() {
                 }
                 args[arg_count] = NULL;
 
-                token = strtok(commands[i], ' ');
-                while (token != NULL && arg_count < 255) {
-                    if (token[0] == '\'' || token[0] == '\"') {
-                        memmove(token, token + 1, strlen(token)); // Remove leading quote
-                        if (token[strlen(token) - 1] == '\'' || token[strlen(token) - 1] == '\"') {
-                            token[strlen(token) - 1] = '\0'; // Remove trailing quote
-                        }
-                    }
-                    args[arg_count++] = token;
-                    token = strtok(NULL, ' ');
-                }
-                args[arg_count] = NULL;
-
                 execvp(args[0], args);
                 perror("execvp");
                 fprintf(stderr, "Failed to execute command: %s\n", args[0]);
