@@ -98,50 +98,20 @@ int main() {
                     }
                 }
 
-                // char *args[256];
-                // int arg_count = 0;
-                // token = strtok(commands[i], " ");
-                // while (token != NULL && arg_count < 255) {
-                //     if (token[0] == '\"') {
-                //         token++;
-                //     }
-                //     if (token[strlen(token) - 1] == '\"') {
-                //         token[strlen(token) - 1] = '\0';
-                //     }
-                //     args[arg_count++] = token;
-                //     token = strtok(NULL, " ");
-                // }
-                // args[arg_count] = NULL;
-
                 char *args[256];
                 int arg_count = 0;
                 token = strtok(commands[i], " ");
                 while (token != NULL && arg_count < 255) {
-                    // Check if the token starts with a quote
-                    if (token[0] == '\'' || token[0] == '\"') {
-                        // If so, keep concatenating tokens until we find the closing quote
-                        char *quote_end = strchr(token + 1, token[0]);
-                        if (quote_end != NULL) {
-                            // Concatenate the token with the quotes
-                            args[arg_count++] = token;
-                            while (token != quote_end) {
-                                token = strtok(NULL, " ");
-                                if (token != NULL)
-                                    strcat(args[arg_count - 1], " ");
-                                    strcat(args[arg_count - 1], token);
-                            }
-                        } else {
-                            fprintf(stderr, "Error: Missing closing quote\n");
-                            exit(EXIT_FAILURE);
-                        }
-                    } else {
-                        // Otherwise, add the token directly to the argument array
-                        args[arg_count++] = token;
+                    if (token[0] == '\"') {
+                        token++;
                     }
+                    if (token[strlen(token) - 1] == '\"') {
+                        token[strlen(token) - 1] = '\0';
+                    }
+                    args[arg_count++] = token;
                     token = strtok(NULL, " ");
                 }
-
-                args[arg_count] = NULL; // NULL-terminated array
+                args[arg_count] = NULL;
 
                 execvp(args[0], args);
                 perror("execvp");
