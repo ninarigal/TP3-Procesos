@@ -138,7 +138,11 @@ int main() {
                 while (token != NULL && arg_count < 255) {
                     if (token[0] == '\'' || token[0] == '\"') {
                         in_quotes = 1;
-                        strcpy(arg_buffer, token + 1); // Copiar el token sin la comilla inicial
+                        if (token[strlen(token) - 1] == '\'' || token[strlen(token) - 1] == '\"') {
+                            args[arg_count++] = strdup(token + 1); // Si el token contiene una sola comilla, agregarlo directamente
+                        } else {
+                            strcpy(arg_buffer, token + 1); // Copiar el token sin la comilla inicial
+                        }
                     } else if (in_quotes && (token[strlen(token) - 1] == '\'' || token[strlen(token) - 1] == '\"')) {
                         strcat(arg_buffer, " "); // Agregar espacio si es necesario
                         strncat(arg_buffer, token, strlen(token) - 1); // Concatenar el token sin la comilla final
@@ -157,10 +161,7 @@ int main() {
                 }
                 args[arg_count] = NULL;
 
-                printf("args: %s\n", args); 
-
-
-
+    
                 execvp(args[0], args);
                 perror("execvp");
                 fprintf(stderr, "Failed to execute command: %s\n", args[0]);
