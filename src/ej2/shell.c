@@ -98,18 +98,82 @@ int main() {
                     }
                 }
 
+//                 char *args[256];
+//                 int arg_count = 0;
+//                 token = strtok(commands[i], " ");
+//                 while (token != NULL && arg_count < 255) {
+//                     if (token[0] == '\'' || token[0] == '\"') {
+//                         memmove(token, token + 1, strlen(token)); // Remove leading quote
+//                         if (token[strlen(token) - 1] == '\'' || token[strlen(token) - 1] == '\"') {
+//                             token[strlen(token) - 1] = '\0'; // Remove trailing quote
+//                         }
+//                     }
+//                     args[arg_count++] = token;
+//                     token = strtok(NULL, " ");
+//                 }
+//                 args[arg_count] = NULL;
+
+//                 execvp(args[0], args);
+//                 perror("execvp");
+//                 fprintf(stderr, "Failed to execute command: %s\n", args[0]);
+//                 exit(EXIT_FAILURE);
+//             }
+//         }
+
+//         for (int i = 0; i < command_count; i++) {
+//             close(fds[i][0]);
+//             close(fds[i][1]);
+//             waitpid(pids[i], NULL, 0);
+//         }
+
+//         command_count = 0; // Reset command count for next iteration
+//     }
+
+//     return 0;
+// }
+
                 char *args[256];
                 int arg_count = 0;
-                token = strtok(commands[i], " ");
-                while (token != NULL && arg_count < 255) {
-                    if (token[0] == '\'' || token[0] == '\"') {
-                        memmove(token, token + 1, strlen(token)); // Remove leading quote
-                        if (token[strlen(token) - 1] == '\'' || token[strlen(token) - 1] == '\"') {
-                            token[strlen(token) - 1] = '\0'; // Remove trailing quote
+                char *subtoken = strtok(commands[i], " ");
+                while (subtoken != NULL && arg_count < 255) {
+                    if (subtoken[0] == '\'' || subtoken[0] == '\"') {
+                        char *subtoken_end = strchr(subtoken + 1, subtoken[0]);
+                        if (subtoken_end != NULL) {
+                            subtoken_end[0] = '\0'; // Replace closing quote with null terminator
+                            args[arg_count++] = subtoken;
+                        } else {
+                            fprintf(stderr, "Unbalanced quotes in command: %s\n", commands[i]);
+                            exit(EXIT_FAILURE);
                         }
+                    } else if (subtoken[0] == '{') {
+                        char *subtoken_end = strchr(subtoken + 1, '}');
+                        if (subtoken_end != NULL) {
+                            subtoken_end[0] = '\0'; // Replace closing brace with null terminator
+                            args[arg_count++] = subtoken;
+                        } else {
+                            // Concatenate tokens until closing brace is found
+                            char *concat_token = subtoken;
+                            subtoken = strtok(NULL, " ");
+                            while (subtoken != NULL) {
+                                strcat(concat_token, " ");
+                                strcat(concat_token, subtoken);
+                                subtoken_end = strchr(concat_token, '}');
+                                if (subtoken_end != NULL) {
+                                    subtoken_end[0] = '\0'; // Replace closing brace with null terminator
+                                    args[arg_count++] = concat_token;
+                                    break;
+                                }
+                                subtoken = strtok(NULL, " ");
+                            }
+                            if (subtoken == NULL) {
+                                fprintf(stderr, "Unbalanced braces in command: %s\n", commands[i]);
+                                exit(EXIT_FAILURE);
+                            }
+                        }
+                    } else {
+                        args[arg_count++] = subtoken;
                     }
-                    args[arg_count++] = token;
-                    token = strtok(NULL, " ");
+                    subtoken = strtok(NULL, " ");
                 }
                 args[arg_count] = NULL;
 
