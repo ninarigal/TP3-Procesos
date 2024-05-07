@@ -137,30 +137,32 @@ int main() {
 
                 while (token != NULL && arg_count < 255) {
                     if (token[0] == '\'' || token[0] == '\"') {
-                        in_quotes = 1;
-                        if (token[strlen(token) - 1] == '\'' || token[strlen(token) - 1] == '\"') {
-                            args[arg_count++] = strdup(token + 1); // Si el token contiene una sola comilla, agregarlo directamente
-                            in_quotes = 0; // Restablecer el estado de comillas
-                        } else {
-                            strcpy(arg_buffer, token + 1); // Copiar el token sin la comilla inicial
-                        }
-                    } else if (in_quotes && (token[strlen(token) - 1] == '\'' || token[strlen(token) - 1] == '\"')) {
-                        strcat(arg_buffer, " "); // Agregar espacio si es necesario
-                        strncat(arg_buffer, token, strlen(token) - 1); // Concatenar el token sin la comilla final
-                        args[arg_count++] = strdup(arg_buffer); // Agregar el argumento completo al array de argumentos
-                        in_quotes = 0; // Restablecer el estado de comillas
-                        arg_buffer[0] = '\0'; // Reiniciar el buffer
-                    } else {
                         if (in_quotes) {
-                            strcat(arg_buffer, " "); // Agregar espacio si es necesario
+                            strcat(arg_buffer, " "); // Agregar espacio si estamos dentro de comillas
                             strcat(arg_buffer, token); // Concatenar el token al buffer
+                            if (token[strlen(token) - 1] == '\'' || token[strlen(token) - 1] == '\"') {
+                                args[arg_count++] = strdup(arg_buffer); // Si es la comilla final, agregar el argumento completo al array
+                                in_quotes = 0; // Restablecer el estado de comillas
+                                arg_buffer[0] = '\0'; // Reiniciar el buffer
+                            }
                         } else {
-                            args[arg_count++] = strdup(token); // Agregar el token al array de argumentos
+                            in_quotes = 1;
+                            if (token[strlen(token) - 1] == '\'' || token[strlen(token) - 1] == '\"') {
+                                args[arg_count++] = strdup(token + 1); // Si el token contiene una sola comilla, agregarlo directamente
+                                in_quotes = 0; // Restablecer el estado de comillas
+                            } else {
+                                strcpy(arg_buffer, token + 1); // Copiar el token sin la comilla inicial
+                            }
                         }
+                    } else if (in_quotes) {
+                        strcat(arg_buffer, " "); // Agregar espacio si estamos dentro de comillas
+                        strcat(arg_buffer, token); // Concatenar el token al buffer
+                    } else {
+                        args[arg_count++] = strdup(token); // Agregar el token al array de argumentos
                     }
                     token = strtok(NULL, " ");
                 }
-                args[arg_count] = NULL; // Agregar un puntero nulo al final del array de argumentos                     
+                args[arg_count] = NULL;
 
     
                 execvp(args[0], args);
