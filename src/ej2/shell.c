@@ -90,21 +90,20 @@ int main() {
                 //     args[arg_count++] = token;
                 //     token = strtok(NULL, " ");
                 // }
+                // args[arg_count] = NULL;
                 char *args[256];
                 int arg_count = 0;
                 int in_quote = 0;
                 char *start = commands[i];
                 char *end = commands[i];
 
-                while (*end != '\0' && arg_count < MAX_COMMANDS - 1) {
+                while (*end != '\0' && arg_count < MAX_COMMANDS) {
                     if (*end == '\"') {
                         in_quote = !in_quote; // Cambiamos el estado de comillas dobles
                     }
                     if (*end == ' ' && !in_quote) {
-                        if (end != start) { // Si no estamos al inicio de un argumento
-                            *end = '\0'; // Terminamos el argumento actual
-                            args[arg_count++] = start; // Guardamos el argumento
-                        }
+                        *end = '\0'; // Terminamos el argumento actual
+                        args[arg_count++] = start; // Guardamos el argumento
                         start = end + 1; // Movemos el puntero de inicio al siguiente caracter
                     }
                     end++;
@@ -112,14 +111,10 @@ int main() {
 
                 // Si hay un argumento después del último espacio o al final de la cadena
                 if (end != start) {
-                    *end = '\0'; // Terminamos el último argumento
                     args[arg_count++] = start; // Guardamos el último argumento
                 }
 
                 args[arg_count] = NULL;
-
-                execvp(args[0], args);
-                // args[arg_count] = NULL;
 
                 execvp(args[0], args);
                 perror("execvp");
