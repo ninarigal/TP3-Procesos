@@ -37,7 +37,6 @@ int main(int argc, char **argv)
 	// Proceso padre envía el mensaje inicial al primer hijo
     printf("Proceso padre envía el mensaje %d al proceso %d\n", buffer[0], start);
     write(fds[start][1], &buffer, sizeof(int));
-    // close(fds[start][1]); 
 
     // Crear procesos hijos
     for (int i = 0; i < n; i++) {
