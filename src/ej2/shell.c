@@ -92,6 +92,8 @@ int main() {
                 // }
                 // args[arg_count] = NULL;
 
+                printf("commands[%d]: %s\n", i, commands[i]);
+
                 char *args[256];
                 int arg_count = 0;
                 token = strtok(commands[i], " ");
