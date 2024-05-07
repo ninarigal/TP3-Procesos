@@ -12,7 +12,6 @@ int main(int argc, char **argv)
 	if (argc != 4){ printf("Uso: anillo <n> <c> <s> \n"); exit(0);}
     
     /* Parsing of arguments */
-  	/* TO COMPLETE */
 	n = atoi(argv[1]); // cantidad de procesos del anillo
 	buffer[0] = atoi(argv[2]); // valor del mensaje inicial
 	start = atoi(argv[3]); // número de proceso que inicia el comunicación
@@ -38,7 +37,7 @@ int main(int argc, char **argv)
 	// Proceso padre envía el mensaje inicial al primer hijo
     printf("Proceso padre envía el mensaje %d al proceso %d\n", buffer[0], start);
     write(fds[start][1], &buffer, sizeof(int));
-    close(fds[start][1]);  // Cerramos el extremo de escritura
+    close(fds[start][1]); 
 
     // Crear procesos hijos
     for (int i = 0; i < n; i++) {
@@ -48,24 +47,18 @@ int main(int argc, char **argv)
             return (-1);
         }
         if (pid == 0) {  // Proceso hijo
-            close(fds[i][1]);  // Cerramos el extremo de escritura
-            if (i != start) { // Los hijos no inician el mensaje
+            close(fds[i][1]);  
+            if (i != start) {
                 read(fds[i][0], &buffer, sizeof(int));
             }
             printf("Proceso %d recibió el mensaje %d\n", i, buffer[0]);
-            buffer[0]++; // Incrementamos el mensaje
-            if (i == (start + n - 1) % n) { // El último hijo envía el mensaje al proceso padre
+            buffer[0]++; 
+            if (i == (start + n - 1) % n) { // Último hijo
                 printf("Proceso %d envía el mensaje %d al proceso padre\n", i, buffer[0]);
-				write(fds_last[1], &buffer, sizeof(int)); // Enviamos el mensaje al proceso padre
-				// close(fds_last[0]);
-				// close(fds_last[1]);
-				exit(EXIT_SUCCESS);
+				write(fds_last[1], &buffer, sizeof(int));;
             } else {
                 printf("Proceso %d envía el mensaje %d al siguiente proceso\n", i, buffer[0]);
-                write(fds[(i + 1) % n][1], &buffer, sizeof(int)); // Enviamos el mensaje al siguiente proceso
-                // close(fds[i][0]);
-                // close(fds[(i + 1) % n][1]);
-                exit(EXIT_SUCCESS);
+                write(fds[(i + 1) % n][1], &buffer, sizeof(int)); 
             }
 
 			for (int j = 0; j < n; j++) {
@@ -78,8 +71,7 @@ int main(int argc, char **argv)
 			return 0;
 
         } else {  // Proceso padre
-			// close(fds[i][0]);  // Cerramos el extremo de lectura
-            if (i == (start + n - 1) % n) { // Si es el último proceso hijo, guardamos su PID
+            if (i == (start + n - 1) % n) { // Si es el último proceso hijo, guardo su PID
 				status = pid;
             }
         }
