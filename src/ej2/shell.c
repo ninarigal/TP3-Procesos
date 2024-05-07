@@ -157,6 +157,8 @@ int main() {
                 }
                 args[arg_count] = NULL;
 
+                printf("args: %s\n", args); 
+
 
 
                 execvp(args[0], args);
