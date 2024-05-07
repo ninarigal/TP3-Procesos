@@ -140,6 +140,7 @@ int main() {
                         in_quotes = 1;
                         if (token[strlen(token) - 1] == '\'' || token[strlen(token) - 1] == '\"') {
                             args[arg_count++] = strdup(token + 1); // Si el token contiene una sola comilla, agregarlo directamente
+                            in_quotes = 0; // Restablecer el estado de comillas
                         } else {
                             strcpy(arg_buffer, token + 1); // Copiar el token sin la comilla inicial
                         }
@@ -159,7 +160,7 @@ int main() {
                     }
                     token = strtok(NULL, " ");
                 }
-                args[arg_count] = NULL;
+                args[arg_count] = NULL; // Agregar un puntero nulo al final del array de argumentos                     
 
     
                 execvp(args[0], args);
