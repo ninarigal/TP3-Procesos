@@ -138,7 +138,9 @@ int main() {
                 while (token != NULL && arg_count < 255) {
                     if (token[0] == '\'' || token[0] == '\"') {
                         if (token[strlen(token) - 1] == '\'' || token[strlen(token) - 1] == '\"') {
-                            args[arg_count++] = strdup(token + 1); // Agregar el token sin las comillas al array de argumentos
+                            memmove(token, token + 1, strlen(token)); // Remove leading quote
+                            token[strlen(token) - 1] = '\0'; // Remove trailing quote
+                            args[arg_count++] = strdup(token);
                         } else {
                             in_quotes = 1;
                             strcpy(arg_buffer, token + 1); // Copiar el token sin la comilla inicial
