@@ -108,6 +108,7 @@ int main() {
                     if (in_quote) {
                         args[arg_count] = strcat(args[arg_count], " "); // Agregar espacio para tokens entre comillas
                         args[arg_count] = strcat(args[arg_count], token); // Agregar token a la parte actual del argumento
+                        printf("args[%d]: %s\n", arg_count, args[arg_count]);
                     } else {
                         args[arg_count++] = token;
                     }
