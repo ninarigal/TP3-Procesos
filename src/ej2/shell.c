@@ -111,11 +111,6 @@ int main() {
                     if (token[0] == '\'' || token[0] == '\"') {
                         in_quotes = 1;
                         strcpy(arg_buffer, token + 1); // Copiar el token sin la comilla inicial
-                        // si no hay espacio entre la comilla y el argumento
-                        if (token[1] != '\0' && (token[1] != '\'' && token[1] != '\"')) {
-                            strcat(arg_buffer, " "); // Agregar espacio si es necesario
-                        }
-
                         
                     } else if (in_quotes && (token[strlen(token) - 1] == '\'' || token[strlen(token) - 1] == '\"')) {
                         strcat(arg_buffer, " "); // Agregar espacio si es necesario
