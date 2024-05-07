@@ -69,12 +69,12 @@ int main() {
                     }
                     close(fds[i][1]);
                 }
-                // for (int j = 0; j < command_count; j++) {
-                //     if (j != i) {
-                //         close(fds[j][0]);
-                //         close(fds[j][1]);
-                //     }
-                // }
+                for (int j = 0; j < command_count; j++) {
+                    if (j != i) {
+                        close(fds[j][0]);
+                        close(fds[j][1]);
+                    }
+                }
 
                 char *args[256];
                 int arg_count = 0;
