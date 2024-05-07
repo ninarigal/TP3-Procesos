@@ -6,14 +6,14 @@
 
 #define MAX_COMMANDS 200
 
-char *strdup(const char *s) {
-    size_t len = strlen(s) + 1;
-    char *p = malloc(len);
-    if (p != NULL) {
-        memcpy(p, s, len);
-    }
-    return p;
-}
+// char *strdup(const char *s) {
+//     size_t len = strlen(s) + 1;
+//     char *p = malloc(len);
+//     if (p != NULL) {
+//         memcpy(p, s, len);
+//     }
+//     return p;
+// }
 
 int main() {
 
@@ -52,30 +52,30 @@ int main() {
 
         for (int i = 0; i < command_count; i++) {
             if (pipe(fds[i]) == -1) {
-                perror("pipe");
-                exit(EXIT_FAILURE);
+                fprintf(stderr, "Error en la creación de pipes");
+                return (-1);
             }
         }
 
         for (int i = 0; i < command_count; i++) {
             pids[i] = fork();
             if (pids[i] == -1) {
-                perror("fork");
-                exit(EXIT_FAILURE);
+                fprintf(stderr, "Error en la creación del proceso");
+                return (-1);
             } else if (pids[i] == 0) {  // Child process
                 if (i != 0) {
                     close(fds[i - 1][1]);
                     if (dup2(fds[i - 1][0], STDIN_FILENO) == -1) {
-                        perror("dup2");
-                        exit(EXIT_FAILURE);
+                        fprintf(stderr, "Error en dup2");
+                        return (-1);
                     }
                     close(fds[i - 1][0]);
                 }
                 if (i != command_count - 1) {
                     close(fds[i][0]);
                     if (dup2(fds[i][1], STDOUT_FILENO) == -1) {
-                        perror("dup2");
-                        exit(EXIT_FAILURE);
+                        fprintf(stderr, "Error en dup2");
+                        return (-1);
                     }
                     close(fds[i][1]);
                 }
@@ -137,9 +137,8 @@ int main() {
                 // args[arg_count] = NULL;
 
                 execvp(args[0], args);
-                perror("execvp");
                 fprintf(stderr, "Failed to execute command: %s\n", args[0]);
-                exit(EXIT_FAILURE);
+                return (-1);
             }
         }
 
