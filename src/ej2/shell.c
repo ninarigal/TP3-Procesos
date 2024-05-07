@@ -117,6 +117,8 @@ int main() {
                         }
                     }
                     token = strtok(NULL, " ");
+                    free(token);
+                    free(arg_buffer);
                 }
                 args[arg_count] = NULL;
 
