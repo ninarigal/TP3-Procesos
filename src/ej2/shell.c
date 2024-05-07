@@ -6,27 +6,6 @@
 
 #define MAX_COMMANDS 200
 
-/*
-En este práctico, se busca el desarrollo de un shell interactivo en lenguaje C. Un shell, en esencia, es un programa que ejecuta otros programas en respuesta a 
-comandos introducidos mediante texto. Dado que el objetivo principal es evaluar el conocimiento sobre aspectos fundamentales de sistemas operativos, se ha optado 
-por omitir la tarea de procesar cadenas de texto. El parsing es crucial en un shell, ya que un algoritmo sólido para esta tarea simplifica considerablemente el 
-diseño de la interacción entre el software y el sistema operativo.
-
-Como seguramente ya estarán intuyendo, un shell es un software que actúa como interfaz con el sistema operativo, facilitando la interacción de los programas a nivel 
-usuario con el SO. Esta interacción se lleva a cabo mediante syscalls (llamadas al sistema), es decir, cuando un programa requiere realizar una tarea que demanda 
-privilegios de nivel de sistema operativo, como leer o escribir en el disco, enviar datos a través de la red o crear un nuevo proceso, no puede acceder directamente 
-a los recursos del sistema. En su lugar, realiza una llamada al sistema, que consiste en una solicitud al kernel para que realice la operación en su nombre. 
-
-La biblioteca GNU C encapsula estas llamadas al sistema mediante funciones que siguen el estándar POSIX2 que ya estuvieron utilizando, por ejemplo: fork, open, read, 
-write, dup, dup2, waitpid, execvp, close, etc. Recuerden que ejecutando en su terminal el comando: man execvp
-pueden obtener información sumamente útil y detallada sobre la funcionalidad de los diferentes syscalls. Otro punto importante, es que lean la documentación en el 
-manual de linux de TODAS las syscalls que van a estar utilizando, sobre todo hagan hincapié en entender que hace waitpid y close para usarlas de manera correcta 
-porque les va a ahorrar bastantes dolores de cabeza.
-
-En concreto, el código que deben programar debe resolver el siguiente problema: dada una cadena de programas separados mediante pipes “|”, su programa debe poder 
-reproducir la funcionalidad de su bash.
-*/
-
 int main() {
 
     char command[256];
@@ -98,20 +77,49 @@ int main() {
                     }
                 }
 
+                // char *args[256];
+                // int arg_count = 0;
+                // token = strtok(commands[i], " ");
+                // while (token != NULL && arg_count < 255) {
+                //     if (token[0] == '\'' || token[0] == '\"') {
+                //         memmove(token, token + 1, strlen(token)); // Remove leading quote
+                //         if (token[strlen(token) - 1] == '\'' || token[strlen(token) - 1] == '\"') {
+                //             token[strlen(token) - 1] = '\0'; // Remove trailing quote
+                //         }
+                //     }
+                //     args[arg_count++] = token;
+                //     token = strtok(NULL, " ");
+                // }
+                // args[arg_count] = NULL;
+
                 char *args[256];
                 int arg_count = 0;
-                token = strtok(commands[i], " ");
-                while (token != NULL && arg_count < 255) {
-                    if (token[0] == '\'' || token[0] == '\"') {
-                        memmove(token, token + 1, strlen(token)); // Remove leading quote
-                        if (token[strlen(token) - 1] == '\'' || token[strlen(token) - 1] == '\"') {
-                            token[strlen(token) - 1] = '\0'; // Remove trailing quote
+                int in_quote = 0;
+                char *start = commands[i];
+                char *end = commands[i];
+
+                while (*end != '\0' && arg_count < 255) {
+                    if (*end == ' ' && !in_quote) {
+                        if (end != start) { // Si no estamos al inicio de un argumento
+                            *end = '\0'; // Terminamos el argumento actual
+                            args[arg_count++] = start; // Guardamos el argumento
                         }
+                        start = end + 1; // Movemos el puntero de inicio al siguiente caracter
+                    } else if (*end == '\'' || *end == '\"') {
+                        in_quote = !in_quote; // Cambiamos el estado de comillas
                     }
-                    args[arg_count++] = token;
-                    token = strtok(NULL, " ");
+                    end++;
                 }
+
+                // Si hay un argumento después del último espacio o al final de la cadena
+                if (end != start) {
+                    *end = '\0'; // Terminamos el último argumento
+                    args[arg_count++] = start; // Guardamos el último argumento
+                }
+
                 args[arg_count] = NULL;
+
+                execvp(args[0], args);
 
                 execvp(args[0], args);
                 perror("execvp");
