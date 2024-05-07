@@ -77,43 +77,17 @@ int main() {
                     }
                 }
 
-                // char *args[256];
-                // int arg_count = 0;
-                // token = strtok(commands[i], " ");
-                // while (token != NULL && arg_count < 255) {
-                //     if (token[0] == '\'' || token[0] == '\"') {
-                //         memmove(token, token + 1, strlen(token)); // Remove leading quote
-                //         if (token[strlen(token) - 1] == '\'' || token[strlen(token) - 1] == '\"') {
-                //             token[strlen(token) - 1] = '\0'; // Remove trailing quote
-                //         }
-                //     }
-                //     args[arg_count++] = token;
-                //     token = strtok(NULL, " ");
-                // }
-                // args[arg_count] = NULL;
-
-                printf("commands[%d]: %s\n", i, commands[i]);
-
                 char *args[256];
                 int arg_count = 0;
                 token = strtok(commands[i], " ");
-                int in_quote = 0; // Indica si estamos dentro de comillas
                 while (token != NULL && arg_count < 255) {
                     if (token[0] == '\'' || token[0] == '\"') {
-                        in_quote = 1;
-                        memmove(token, token + 1, strlen(token)); // Eliminar comillas iniciales
+                        memmove(token, token + 1, strlen(token)); // Remove leading quote
+                        if (token[strlen(token) - 1] == '\'' || token[strlen(token) - 1] == '\"') {
+                            token[strlen(token) - 1] = '\0'; // Remove trailing quote
+                        }
                     }
-                    if (token[strlen(token) - 1] == '\'' || token[strlen(token) - 1] == '\"') {
-                        in_quote = 0;
-                        token[strlen(token) - 1] = '\0'; // Eliminar comillas finales
-                    }
-                    if (in_quote) {
-                        args[arg_count] = strcat(args[arg_count], " "); // Agregar espacio para tokens entre comillas
-                        args[arg_count] = strcat(args[arg_count], token); // Agregar token a la parte actual del argumento
-                        printf("args[%d]: %s\n", arg_count, args[arg_count]);
-                    } else {
-                        args[arg_count++] = token;
-                    }
+                    args[arg_count++] = token;
                     token = strtok(NULL, " ");
                 }
                 args[arg_count] = NULL;
