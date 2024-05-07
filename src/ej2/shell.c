@@ -6,15 +6,6 @@
 
 #define MAX_COMMANDS 200
 
-char *strdup(const char *s) {
-    size_t len = strlen(s) + 1;
-    char *p = malloc(len);
-    if (p != NULL) {
-        memcpy(p, s, len);
-    }
-    return p;
-}
-
 int main() {
 
     char command[256];
@@ -46,7 +37,6 @@ int main() {
             token = strtok(NULL, "|");
         }
         /* You should start programming from here... */
-
         int fds[command_count][2];
         int pids[command_count];
 
@@ -79,62 +69,27 @@ int main() {
                     }
                     close(fds[i][1]);
                 }
-                for (int j = 0; j < command_count; j++) {
-                    if (j != i) {
-                        close(fds[j][0]);
-                        close(fds[j][1]);
-                    }
-                }
-
-                // char *args[256];
-                // int arg_count = 0;
-                // token = strtok(commands[i], " ");
-                // while (token != NULL && arg_count < 255) {
-                //     if (token[0] == '\'' || token[0] == '\"') {
-                //         memmove(token, token + 1, strlen(token)); // Remove leading quote
-                //         if (token[strlen(token) - 1] == '\'' || token[strlen(token) - 1] == '\"') {
-                //             token[strlen(token) - 1] = '\0'; // Remove trailing quote
-                //         }
+                // for (int j = 0; j < command_count; j++) {
+                //     if (j != i) {
+                //         close(fds[j][0]);
+                //         close(fds[j][1]);
                 //     }
-                //     args[arg_count++] = token;
-                //     token = strtok(NULL, " ");
                 // }
-                // args[arg_count] = NULL; 
 
                 char *args[256];
                 int arg_count = 0;
                 token = strtok(commands[i], " ");
-                int in_quotes = 0;
-                char arg_buffer[256] = ""; // Buffer para almacenar el argumento entre comillas
-
                 while (token != NULL && arg_count < 255) {
                     if (token[0] == '\'' || token[0] == '\"') {
+                        memmove(token, token + 1, strlen(token)); // Remove leading quote
                         if (token[strlen(token) - 1] == '\'' || token[strlen(token) - 1] == '\"') {
-                            memmove(token, token + 1, strlen(token)); // Remove leading quote
                             token[strlen(token) - 1] = '\0'; // Remove trailing quote
-                            args[arg_count++] = strdup(token);
-                        } else {
-                            in_quotes = 1;
-                            strcpy(arg_buffer, token + 1); // Copiar el token sin la comilla inicial
-                        }
-                    } else if (in_quotes && (token[strlen(token) - 1] == '\'' || token[strlen(token) - 1] == '\"')) {
-                        strcat(arg_buffer, " "); // Agregar espacio si es necesario
-                        strncat(arg_buffer, token, strlen(token) - 1); // Concatenar el token sin la comilla final
-                        args[arg_count++] = strdup(arg_buffer); // Agregar el argumento completo al array de argumentos
-                        in_quotes = 0; // Restablecer el estado de comillas
-                        arg_buffer[0] = '\0'; // Reiniciar el buffer
-                    } else {
-                        if (in_quotes) {
-                            strcat(arg_buffer, " "); // Agregar espacio si es necesario
-                            strcat(arg_buffer, token); // Concatenar el token al buffer
-                        } else {
-                            args[arg_count++] = strdup(token); // Agregar el token al array de argumentos
                         }
                     }
+                    args[arg_count++] = token;
                     token = strtok(NULL, " ");
-                    
                 }
-                args[arg_count] = NULL;
+                args[arg_count] = NULL; 
 
                 execvp(args[0], args);
                 fprintf(stderr, "Failed to execute command: %s\n", args[0]);
@@ -148,7 +103,7 @@ int main() {
             waitpid(pids[i], NULL, 0);
         }
 
-        command_count = 0; // Reset command count for next iteration
+        command_count = 0; 
     }
 
     return 0;
