@@ -143,12 +143,11 @@ int main() {
                         } else {
                             strcat(arg_buffer, " "); // Agregar espacio si es necesario
                             strcat(arg_buffer, token); // Concatenar el token al buffer
-                        }
-
-                        if (token[strlen(token) - 1] == '\'' || token[strlen(token) - 1] == '\"') {
-                            args[arg_count++] = strdup(arg_buffer); // Agregar el argumento completo al array de argumentos
-                            in_quotes = 0; // Restablecer el estado de comillas
-                            arg_buffer[0] = '\0'; // Reiniciar el buffer
+                            if (token[strlen(token) - 1] == '\'' || token[strlen(token) - 1] == '\"') {
+                                args[arg_count++] = strdup(arg_buffer); // Agregar el argumento completo al array de argumentos
+                                in_quotes = 0; // Restablecer el estado de comillas
+                                arg_buffer[0] = '\0'; // Reiniciar el buffer
+                            }
                         }
                     } else if (in_quotes) {
                         strcat(arg_buffer, " "); // Agregar espacio si estamos dentro de comillas
@@ -159,6 +158,7 @@ int main() {
                     token = strtok(NULL, " ");
                 }
                 args[arg_count] = NULL;
+
 
     
                 execvp(args[0], args);
