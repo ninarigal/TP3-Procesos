@@ -96,7 +96,7 @@ int main() {
                 char *start = commands[i];
                 char *end = commands[i];
 
-                while (*end != '\0' && arg_count < 255) {
+                while (*end != '\0' && arg_count < MAX_COMMANDS - 1) {
                     if (*end == '\"') {
                         in_quote = !in_quote; // Cambiamos el estado de comillas dobles
                     }
