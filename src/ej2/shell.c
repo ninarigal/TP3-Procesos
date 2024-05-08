@@ -71,22 +71,20 @@ int main() {
                         close(fds[j][1]);
                     }
                 }
-
                 char *args[256];
                 int arg_count = 0;
                 token = strtok(commands[i], " ");
                 while (token != NULL && arg_count < 255) {
                     if (token[0] == '\'' || token[0] == '\"') {
-                        memmove(token, token + 1, strlen(token)); // Remove leading quote
+                        memmove(token, token + 1, strlen(token)); 
                         if (token[strlen(token) - 1] == '\'' || token[strlen(token) - 1] == '\"') {
-                            token[strlen(token) - 1] = '\0'; // Remove trailing quote
+                            token[strlen(token) - 1] = '\0'; 
                         }
                     }
                     args[arg_count++] = token;
                     token = strtok(NULL, " ");
                 }
                 args[arg_count] = NULL; 
-
                 execvp(args[0], args);
                 fprintf(stderr, "Failed to execute command: %s\n", args[0]);
                 return (-1);
