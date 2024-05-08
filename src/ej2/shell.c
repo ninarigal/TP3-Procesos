@@ -54,20 +54,16 @@ int main() {
                 return (-1);
             } else if (pids[i] == 0) {  // Child process
                 if (i != 0) {
-                    // close(fds[i - 1][1]);
                     if (dup2(fds[i - 1][0], STDIN_FILENO) == -1) {
                         fprintf(stderr, "Error en dup2");
                         return (-1);
                     }
-                    // close(fds[i - 1][0]);
                 }
                 if (i != command_count - 1) {
-                    // close(fds[i][0]);
                     if (dup2(fds[i][1], STDOUT_FILENO) == -1) {
                         fprintf(stderr, "Error en dup2");
                         return (-1);
                     }
-                    // close(fds[i][1]);
                 }
                 for (int j = 0; j < command_count; j++) {
                     if (j != i) {
@@ -90,6 +86,8 @@ int main() {
                     token = strtok(NULL, " ");
                 }
                 args[arg_count] = NULL; 
+                free(commands[i]);
+                free(token);
 
                 execvp(args[0], args);
                 fprintf(stderr, "Failed to execute command: %s\n", args[0]);
