@@ -86,8 +86,6 @@ int main() {
                     token = strtok(NULL, " ");
                 }
                 args[arg_count] = NULL; 
-                free(commands[i]);
-                free(token);
 
                 execvp(args[0], args);
                 fprintf(stderr, "Failed to execute command: %s\n", args[0]);
